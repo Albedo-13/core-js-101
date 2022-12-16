@@ -27,8 +27,18 @@
  *  21 => 'Fizz'
  *
  */
-function getFizzBuzz(/* num */) {
-  throw new Error('Not implemented');
+function getFizzBuzz(num) {
+  let result = '';
+  if (num % 3 === 0) {
+    result += 'Fizz';
+  }
+  if (num % 5 === 0) {
+    result += 'Buzz';
+  }
+  if (result) {
+    return result;
+  }
+  return num;
 }
 
 
@@ -43,8 +53,8 @@ function getFizzBuzz(/* num */) {
  *   5  => 120
  *   10 => 3628800
  */
-function getFactorial(/* n */) {
-  throw new Error('Not implemented');
+function getFactorial(n) {
+  return n < 2 ? 1 : n * getFactorial(n - 1);
 }
 
 
@@ -60,8 +70,8 @@ function getFactorial(/* n */) {
  *   5,10  =>  45 ( = 5+6+7+8+9+10 )
  *   -1,1  =>  0  ( = -1 + 0 + 1 )
  */
-function getSumBetweenNumbers(/* n1, n2 */) {
-  throw new Error('Not implemented');
+function getSumBetweenNumbers(n1, n2) {
+  return n2 <= n1 ? n1 : n2 + getSumBetweenNumbers(n1, n2 - 1);
 }
 
 
@@ -80,10 +90,10 @@ function getSumBetweenNumbers(/* n1, n2 */) {
  *   10,1,1   =>  false
  *   10,10,10 =>  true
  */
-function isTriangle(/* a, b, c */) {
-  throw new Error('Not implemented');
+function isTriangle(a, b, c) {
+  const sides = [a, b, c].sort((x, y) => y - x);
+  return sides[0] < sides[1] + sides[2];
 }
-
 
 /**
  * Returns true, if two specified axis-aligned rectangles overlap, otherwise false.
@@ -117,10 +127,18 @@ function isTriangle(/* a, b, c */) {
  *   { top:20, left:20, width: 20, height: 20 }    =>  false
  *
  */
-function doRectanglesOverlap(/* rect1, rect2 */) {
-  throw new Error('Not implemented');
-}
+function doRectanglesOverlap(rect1, rect2) {
+  if (Math.abs(rect2.top - rect1.top)
+    >= Math.min(...[rect1.top + rect1.height, rect2.top + rect2.height])) {
+    return false;
+  }
+  if (Math.abs(rect2.left - rect1.left)
+  >= Math.min(...[rect1.left + rect1.width, rect2.left + rect2.width])) {
+    return false;
+  }
 
+  return true;
+}
 
 /**
  * Returns true, if point lies inside the circle, otherwise false.
@@ -148,10 +166,11 @@ function doRectanglesOverlap(/* rect1, rect2 */) {
  *   { center: { x:0, y:0 }, radius:10 },  { x:10, y:10 }   => false
  *
  */
-function isInsideCircle(/* circle, point */) {
-  throw new Error('Not implemented');
+function isInsideCircle(circle, point) {
+  const pointPow = (point.x - circle.center.x) ** 2 + (point.y - circle.center.y) ** 2;
+  const circlePow = circle.radius ** 2;
+  return pointPow < circlePow;
 }
-
 
 /**
  * Returns the first non repeated char in the specified strings otherwise returns null.
@@ -164,10 +183,23 @@ function isInsideCircle(/* circle, point */) {
  *   'abracadabra'  => 'c'
  *   'entente' => null
  */
-function findFirstSingleChar(/* str */) {
-  throw new Error('Not implemented');
+function findFirstSingleChar(str) {
+  let strCopy = str;
+  for (let i = 0; i < strCopy.length - 1; i += 1) {
+    for (let j = i + 1; j < strCopy.length; j += 1) {
+      if (strCopy[i] === strCopy[j]) {
+        strCopy = strCopy.replace(new RegExp(`${strCopy[i]}`, 'ig'), '');
+        i = -1;
+        j = i + 1;
+        break;
+      }
+    }
+  }
+  if (strCopy) {
+    return strCopy[0];
+  }
+  return null;
 }
-
 
 /**
  * Returns the string representation of math interval,
@@ -191,8 +223,8 @@ function findFirstSingleChar(/* str */) {
  *   5, 3, true, true   => '[3, 5]'
  *
  */
-function getIntervalString(/* a, b, isStartIncluded, isEndIncluded */) {
-  throw new Error('Not implemented');
+function getIntervalString(a, b, isStartIncluded, isEndIncluded) {
+  return `${isStartIncluded ? '[' : '('}${Math.min(...[a, b])}, ${Math.max(...[a, b])}${isEndIncluded ? ']' : ')'}`;
 }
 
 
@@ -208,8 +240,8 @@ function getIntervalString(/* a, b, isStartIncluded, isEndIncluded */) {
  * 'rotator' => 'rotator'
  * 'noon' => 'noon'
  */
-function reverseString(/* str */) {
-  throw new Error('Not implemented');
+function reverseString(str) {
+  return str.split('').reverse().join('');
 }
 
 
@@ -225,8 +257,8 @@ function reverseString(/* str */) {
  *   87354 => 45378
  *   34143 => 34143
  */
-function reverseInteger(/* num */) {
-  throw new Error('Not implemented');
+function reverseInteger(num) {
+  return +num.toString().split('').reverse().join('');
 }
 
 
@@ -250,9 +282,21 @@ function reverseInteger(/* num */) {
  *   5436468789016589 => false
  *   4916123456789012 => false
  */
-function isCreditCardNumber(/* ccn */) {
-  throw new Error('Not implemented');
+function isCreditCardNumber(ccn) {
+  let cardNumber = ccn.toString().split('').reverse();
+  const validDigit = +cardNumber[0];
+  cardNumber = cardNumber.slice(1);
+
+  cardNumber = cardNumber
+    .map((item, i) => (i % 2 ? item : (item * 2).toString()))
+    .map((item) => (+item > 9 ? (Math.floor(item / 10) + (item % 10)).toString() : item));
+
+  const cardDigitsSum = cardNumber.reduce((acc, item) => acc + (+item), 0);
+  const cardDigitsSumMod10 = (10 - (cardDigitsSum % 10)) % 10;
+
+  return cardDigitsSumMod10 === validDigit;
 }
+
 
 /**
  * Returns the digital root of integer:
@@ -268,8 +312,9 @@ function isCreditCardNumber(/* ccn */) {
  *   10000 ( 1+0+0+0+0 = 1 ) => 1
  *   165536 (1+6+5+5+3+6 = 26,  2+6 = 8) => 8
  */
-function getDigitalRoot(/* num */) {
-  throw new Error('Not implemented');
+function getDigitalRoot(num) {
+  const digitalRoot = num.toString().split('').reduce((accum, item) => +(item) + accum, 0);
+  return digitalRoot > 10 ? getDigitalRoot(digitalRoot) : digitalRoot;
 }
 
 
@@ -320,6 +365,9 @@ function isBracketsBalanced(/* str */) {
  *    365, 10 => '365'
  */
 function toNaryString(/* num, n */) {
+  // toString second argument?
+  // ну или какой там метод вторым аргументом принимает нарность значения.
+  // Мб парс или еще что
   throw new Error('Not implemented');
 }
 
@@ -336,10 +384,22 @@ function toNaryString(/* num, n */) {
  *   ['/web/assets/style.css', '/.bin/mocha',  '/read.me'] => '/'
  *   ['/web/favicon.ico', '/web-scripts/dump', '/verbalizer/logs'] => '/'
  */
-function getCommonDirectoryPath(/* pathes */) {
-  throw new Error('Not implemented');
-}
+function getCommonDirectoryPath(pathes) {
+  let commonPath = '';
 
+  return (() => {
+    for (let i = 0; i < pathes[0].length; i += 1) {
+      for (let j = 0; j < pathes.length; j += 1) {
+        if (pathes[0][i] !== pathes[j][i]) {
+          return commonPath;
+        }
+      }
+      commonPath += pathes[0][i];
+    }
+    return commonPath;
+  })()
+    .slice(0, commonPath.split('').lastIndexOf('/') + 1);
+}
 
 /**
  * Returns the product of two specified matrixes.
